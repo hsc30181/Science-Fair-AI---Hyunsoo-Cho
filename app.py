@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, request
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+import base64
+from io import BytesIOpre
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "uytrfdcvbnjuytresdes"
@@ -18,12 +20,13 @@ def preprocess_image(img_path):
 def index():
     return render_template("index.html")
 
-@app.route("/images_trained_<model>")
+@app.route("/model_<model>")
 def model_selection():
     return render_template("model_test.html", model = model)
 
-@app.route("/model_test")
+@app.route("/model_test_<model>")
 def model_test():
-    data = request.get_json()
-    model = data["model"]
-    tf.keras.models.load_model(f"/models/{model}")
+    file = request.files["image"]
+    img_bytes = file.read()
+    img_base64 = base64.b64encode(img_bytes).decode("utf-8")
+    mime_type = file.content_type
