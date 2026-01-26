@@ -48,3 +48,6 @@ Class 2: TV,
 Class 3: T-shirt,
 Class 4: Beaker
 """
+
+for test in range(100):
+    pass
