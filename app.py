@@ -50,4 +50,4 @@ Class 4: Beaker
 """
 
 for test in range(100):
-    pass
+    calculate_accuracy(model_fifty, true_labels)
