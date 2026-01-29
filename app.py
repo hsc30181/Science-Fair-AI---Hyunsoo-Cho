@@ -4,6 +4,8 @@ import numpy as np
 from PIL import Image
 import base64
 from io import BytesIO
+import os
+import sys
 
 IMG_SIZE = 224
 
@@ -48,6 +50,20 @@ Class 2: TV,
 Class 3: T-shirt,
 Class 4: Beaker
 """
+classes = ["class_chair", "class_computer", "class_tv", "class_tshirt", "class_beaker"]
+for class_name in classes:
+    images = []
+    for i in range(10):
+        image_count = i
+        image_name = f"test{i}.png"
+        path = os.path.join("class_name", class_name, image_name)
+        images.append(image_name)
+    for image in images:
+        print(f"Accuracy for Model Fifty, Class {class_name}: {calculate_accuracy(model_fifty, true_labels, image)}")
+    for image in images:
+        print(f"Accuracy for Model Hundred, Class {class_name}: {calculate_accuracy(model_hundred, true_labels, image)}")
+    for image in images:
+        print(f"Accuracy for Model Hund_Fif, Class {class_name}: {calculate_accuracy(model_hund_fif, true_labels, image)}")
 
-for test in range(100):
-    calculate_accuracy(model_fifty, true_labels)
+print("Test ended.")
+sys.exit()
