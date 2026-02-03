@@ -1,69 +1,86 @@
-import tensorflow as tf
-from keras.models import load_model
 import numpy as np
-from PIL import Image
-import base64
-from io import BytesIO
 import os
 import sys
+from PIL import Image
+from keras.models import load_model
 
 IMG_SIZE = 224
 
-model_fifty = load_model("/models/fifty.h5")
-model_hundred = load_model("/models/hundred.h5")
-model_hund_fif = load_model("/models/hund_fif.h5")
+# ===============================
+# Load models
+# ===============================
+model_fifty = load_model("models/fifty", compile=False)
+model_hundred = load_model("models/hundred", compile=False)
+model_hund_fif = load_model("models/hund_fif", compile=False)
 
-true_labels = [0, 1, 2, 3, 4]
-image_paths = []
+# ===============================
+# Classes
+# ===============================
+classes = [
+    "class_chair",
+    "class_computer",
+    "class_airplane",
+    "class_boat",
+    "class_beaker"
+]
 
+# ===============================
+# Image preprocessing
+# ===============================
 def preprocess_image(img_path):
     img = Image.open(img_path).convert("RGB")
-    img = img.resize((IMG_SIZE, IMG_SIZE))      
-    img = np.array(img) / 255.0
+    img = img.resize((IMG_SIZE, IMG_SIZE))
+    img = np.array(img, dtype=np.float32) / 255.0
     return np.expand_dims(img, axis=0)
 
-def calculate_accuracy(model, true_labels, image_path):
-    preds = []
-    confs = []
-    for img_path, true_label in zip(image_path, true_labels):
-        predicted_class, confidence = test_model(img_path, model)
-        preds.append(predicted_class)
-        confs.append(confidence)
-    preds = np.array(preds)
-    confs = np.array(confs)
-    true_labels = np.array(true_labels)
-    correct = (preds == true_labels).astype(float)
-    weighted_accuracy = np.sum(correct * confs) / len(image_path)
-    return weighted_accuracy
-
+# ===============================
+# Single image inference
+# ===============================
 def test_model(image_path, model):
     img = preprocess_image(image_path)
-    y_pred = model.predict(img)
-    predicted_class = int(np.argmax(y_pred, axis=1)[0])
+    y_pred = model.predict(img, verbose=0)
+
+    predicted_class = int(np.argmax(y_pred))
     confidence = float(np.max(y_pred))
+
     return predicted_class, confidence
 
-"""
-Class 0: Chair,
-Class 1: Computer,
-Class 2: TV,
-Class 3: T-shirt,
-Class 4: Beaker
-"""
-classes = ["class_chair", "class_computer", "class_tv", "class_tshirt", "class_beaker"]
-for class_name in classes:
-    images = []
-    for i in range(10):
-        image_count = i
-        image_name = f"test{i}.png"
-        path = os.path.join("class_name", class_name, image_name)
-        images.append(image_name)
-    for image in images:
-        print(f"Accuracy for Model Fifty, Class {class_name}: {calculate_accuracy(model_fifty, true_labels, image)}")
-    for image in images:
-        print(f"Accuracy for Model Hundred, Class {class_name}: {calculate_accuracy(model_hundred, true_labels, image)}")
-    for image in images:
-        print(f"Accuracy for Model Hund_Fif, Class {class_name}: {calculate_accuracy(model_hund_fif, true_labels, image)}")
+# ===============================
+# Weighted accuracy
+# ===============================
+def calculate_weighted_accuracy(model, image_paths, true_label):
+    weighted_sum = 0.0
 
-print("Test ended.")
+    for path in image_paths:
+        pred, conf = test_model(path, model)
+        if pred == true_label:
+            weighted_sum += conf
+
+    return weighted_sum / len(image_paths)
+
+# ===============================
+# Evaluation
+# ===============================
+MODELS = {
+    "Model Fifty": model_fifty,
+    "Model Hundred": model_hundred,
+    "Model Hund_Fif": model_hund_fif
+}
+
+for class_idx, class_name in enumerate(classes):
+    print(f"\n===== Class: {class_name} =====")
+
+    image_paths = []
+    for i in range(10):
+        image_paths.append(
+            os.path.join(class_name, f"test{i}.jpg")
+        )
+
+    for model_name, model in MODELS.items():
+        w_acc = calculate_weighted_accuracy(
+            model, image_paths, class_idx
+        )
+        print(f"{model_name} Weighted Accuracy: {w_acc:.4f}")
+
+print("\nTest ended.")
 sys.exit()
