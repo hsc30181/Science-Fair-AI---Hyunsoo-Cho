@@ -9,9 +9,9 @@ IMG_SIZE = 224
 # ===============================
 # Load models
 # ===============================
-model_fifty = load_model("models/fifty", compile=False)
-model_hundred = load_model("models/hundred", compile=False)
-model_hund_fif = load_model("models/hund_fif", compile=False)
+model_fifty = load_model("models/fifty.keras")
+model_hundred = load_model("models/hundred.keras")
+model_hund_fif = load_model("models/hund_fif.keras")
 
 # ===============================
 # Classes
