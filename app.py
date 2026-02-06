@@ -6,16 +6,10 @@ from keras.models import load_model
 
 IMG_SIZE = 224
 
-# ===============================
-# Load models
-# ===============================
 model_fifty = load_model("models/fifty.keras")
 model_hundred = load_model("models/hundred.keras")
 model_hund_fif = load_model("models/hund_fif.keras")
 
-# ===============================
-# Classes
-# ===============================
 classes = [
     "class_chair",
     "class_computer",
@@ -24,18 +18,12 @@ classes = [
     "class_beaker"
 ]
 
-# ===============================
-# Image preprocessing
-# ===============================
 def preprocess_image(img_path):
     img = Image.open(img_path).convert("RGB")
     img = img.resize((IMG_SIZE, IMG_SIZE))
     img = np.array(img, dtype=np.float32) / 255.0
     return np.expand_dims(img, axis=0)
 
-# ===============================
-# Single image inference
-# ===============================
 def test_model(image_path, model):
     img = preprocess_image(image_path)
     y_pred = model.predict(img, verbose=0)
@@ -45,9 +33,6 @@ def test_model(image_path, model):
 
     return predicted_class, confidence
 
-# ===============================
-# Weighted accuracy
-# ===============================
 def calculate_weighted_accuracy(model, image_paths, true_label):
     weighted_sum = 0.0
 
@@ -58,9 +43,6 @@ def calculate_weighted_accuracy(model, image_paths, true_label):
 
     return weighted_sum / len(image_paths)
 
-# ===============================
-# Evaluation
-# ===============================
 MODELS = {
     "Model Fifty": model_fifty,
     "Model Hundred": model_hundred,
