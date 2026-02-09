@@ -6,9 +6,9 @@ from keras.models import load_model
 
 IMG_SIZE = 224
 
-model_fifty = load_model("models/fifty.keras")
-model_hundred = load_model("models/hundred.keras")
-model_hund_fif = load_model("models/hund_fif.keras")
+model_fifty = load_model("models/fifty.h5")
+model_hundred = load_model("models/hundred.h5")
+model_hund_fif = load_model("models/hund_fif.h5")
 
 classes = [
     "class_chair",
